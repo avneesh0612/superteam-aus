@@ -1,0 +1,74 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-bg text-text antialiased;
+}
+
+.section-blur-green {
+  background: radial-gradient(circle, rgba(104,222,135,0.12) 0%, rgba(104,222,135,0) 70%);
+}
+
+.section-blur-gold {
+  background: radial-gradient(circle, rgba(255,185,83,0.10) 0%, rgba(255,185,83,0) 70%);
+}
+
+.hero-gradient-text {
+  background: linear-gradient(138deg, #68de87 0%, #ffb953 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.card-surface {
+  @apply border border-white/5 bg-panel shadow-card;
+}
+
+.soft-panel {
+  @apply border border-white/5 bg-white/[0.03] backdrop-blur-md;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus {
+  -webkit-text-fill-color: #f8f9fa;
+  -webkit-box-shadow: 0 0 0px 1000px #050816 inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
+
+@keyframes partners-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.partners-marquee {
+  animation: partners-marquee 32s linear infinite;
+}
+
+.partners-marquee:hover {
+  animation-play-state: paused;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .partners-marquee {
+    animation: none;
+  }
+}
