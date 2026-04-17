@@ -38,7 +38,13 @@ export function EventsSection({ events }: { events: EventItem[] }) {
               className="section-shell overflow-hidden rounded-3xl"
             >
               <div className="relative h-56">
-                <Image src={event.image} alt={event.title} fill className="object-cover" />
+                <Image
+                  src={event.image}
+                  alt={event.title}
+                  fill
+                  sizes="(min-width: 1024px) 33vw, 100vw"
+                  className="object-cover"
+                />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute left-4 top-4 rounded-xl bg-black/40 px-4 py-2 text-xs font-semibold uppercase tracking-[0.12em] text-white backdrop-blur-md">
                   {event.city}

@@ -10,10 +10,12 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: clip;
 }
 
 body {
   @apply bg-bg text-text antialiased;
+  overflow-x: clip;
   background-image:
     radial-gradient(circle at top, rgba(104, 222, 135, 0.12), transparent 28%),
     radial-gradient(circle at 85% 12%, rgba(255, 185, 83, 0.14), transparent 18%),

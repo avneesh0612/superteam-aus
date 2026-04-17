@@ -5,12 +5,18 @@ import { Member } from "@/lib/types";
 import { Briefcase, Code2, GraduationCap, Rocket, ShieldCheck, Wrench } from "lucide-react";
 
 export function MemberCard({ member }: { member: Member }) {
-  const RoleIcon = getRoleIcon(member.role);
+  const roleIcon = getRoleIcon(member.role);
 
   return (
     <article className="spotlight-card overflow-hidden rounded-[2rem] transition duration-300">
       <div className="relative h-64">
-        <Image src={member.photo} alt={member.name} fill className="object-cover grayscale transition duration-500 hover:scale-105 hover:grayscale-0" />
+        <Image
+          src={member.photo}
+          alt={member.name}
+          fill
+          sizes="(min-width: 1280px) 20vw, (min-width: 768px) 33vw, 100vw"
+          className="object-cover grayscale transition duration-500 hover:scale-105 hover:grayscale-0"
+        />
         <div className="absolute inset-0 bg-gradient-to-t from-bg via-transparent to-transparent" />
       </div>
 
@@ -36,7 +42,7 @@ export function MemberCard({ member }: { member: Member }) {
 
         <div className="flex items-center justify-between border-t border-white/10 pt-5">
           <div className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-green/90 text-deepgreen shadow-[0_8px_24px_rgba(104,222,135,0.35)]">
-            <RoleIcon className="h-5 w-5" />
+            {roleIcon}
           </div>
 
           {member.twitterUrl ? (
@@ -63,13 +69,13 @@ export function MemberCard({ member }: { member: Member }) {
 function getRoleIcon(role: string) {
   const normalized = role.toLowerCase();
 
-  if (normalized.includes("founder") || normalized.includes("ceo")) return Rocket;
-  if (normalized.includes("student") || normalized.includes("intern")) return GraduationCap;
-  if (normalized.includes("builder")) return Wrench;
-  if (normalized.includes("developer") || normalized.includes("engineer")) return Code2;
-  if (normalized.includes("security") || normalized.includes("audit")) return ShieldCheck;
+  if (normalized.includes("founder") || normalized.includes("ceo")) return <Rocket className="h-5 w-5" />;
+  if (normalized.includes("student") || normalized.includes("intern")) return <GraduationCap className="h-5 w-5" />;
+  if (normalized.includes("builder")) return <Wrench className="h-5 w-5" />;
+  if (normalized.includes("developer") || normalized.includes("engineer")) return <Code2 className="h-5 w-5" />;
+  if (normalized.includes("security") || normalized.includes("audit")) return <ShieldCheck className="h-5 w-5" />;
 
-  return Briefcase;
+  return <Briefcase className="h-5 w-5" />;
 }
 
 function XLogo({ className }: { className?: string }) {

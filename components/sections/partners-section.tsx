@@ -28,7 +28,7 @@ export function PartnersSection({ partners }: { partners: Partner[] }) {
         <p className="text-center text-[11px] font-medium uppercase tracking-[0.35em] text-white/45">Ecosystem & Partners</p>
       </Reveal>
 
-      <div className="relative left-1/2 mt-10 w-screen -translate-x-1/2 overflow-hidden">
+      <div className="relative left-1/2 mt-10 w-dvw -translate-x-1/2 overflow-hidden">
         <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-24 bg-gradient-to-r from-[#0b1017] to-transparent" />
         <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-24 bg-gradient-to-l from-[#0b1017] to-transparent" />
 
@@ -52,6 +52,7 @@ export function PartnersSection({ partners }: { partners: Partner[] }) {
                     src={logoSrc}
                     alt={partner.name}
                     fill
+                    sizes="(min-width: 768px) 220px, 170px"
                     className="object-cover object-center opacity-95 transition-opacity duration-200 hover:opacity-100"
                   />
                 </div>
