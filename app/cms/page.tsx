@@ -1,5 +1,6 @@
 import { getCmsContent, upsertCmsContent } from "@/lib/cms";
 import { InviteAdminForm } from "@/app/cms/invite-admin-form";
+import { ApplicationStatusSubmitButton, LogoutSubmitButton } from "@/app/cms/form-submit-buttons";
 import { SiteSettingsEditor } from "@/app/cms/site-settings-editor";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
@@ -262,12 +263,7 @@ export default async function CMSPage({
             </div>
             <div className="flex flex-wrap justify-end gap-3">
               <form action={logout}>
-                <button
-                  type="submit"
-                  className="rounded-xl border border-white/20 bg-white/[0.03] px-4 py-2 text-sm text-muted transition hover:text-text"
-                >
-                  Logout
-                </button>
+                <LogoutSubmitButton />
               </form>
             </div>
             {canManageAdmins ? (
@@ -418,13 +414,9 @@ export default async function CMSPage({
                                 <option value="accepted">Accepted</option>
                                 <option value="rejected">Rejected</option>
                               </select>
-                              <button
-                                type="submit"
+                              <ApplicationStatusSubmitButton
                                 disabled={!hasSubmissionStatus || !canManageApplications}
-                                className="rounded-lg border border-green/25 bg-green/10 px-2 py-1.5 text-xs font-semibold text-green transition hover:bg-green/15"
-                              >
-                                Save
-                              </button>
+                              />
                             </form>
                           </td>
                           <td className="px-4 py-3 text-muted">
