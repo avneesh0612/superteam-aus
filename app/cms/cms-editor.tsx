@@ -65,6 +65,37 @@ function isValidHref(value: unknown) {
   return isValidAssetPath(value) || isValidUrl(value);
 }
 
+function extractTweetId(url?: string) {
+  if (!url) return null;
+  const match = url.match(/status\/(\d+)/i);
+  return match?.[1] ?? null;
+}
+
+function extractTweetHandle(url?: string) {
+  if (!url) return null;
+  const match = url.match(/x\.com\/([^/]+)\/status\/\d+/i);
+  return match?.[1] ?? null;
+}
+
+function buildAnnouncementFromHref(
+  href: string,
+  fallbackIndex: number
+): { id: string; title: string; summary: string; tag: string; date: string } {
+  const tweetId = extractTweetId(href);
+  const handle = extractTweetHandle(href);
+  const handleLabel = handle ? `@${handle}` : "X";
+  const normalizedHandle = (handle || "tweet").toLowerCase().replace(/[^a-z0-9_-]/g, "");
+  const id = tweetId ? `tweet-${normalizedHandle}-${tweetId}` : `tweet-link-${Date.now()}-${fallbackIndex}`;
+
+  return {
+    id,
+    title: `${handleLabel} post`,
+    summary: `Imported from ${handleLabel}.`,
+    tag: "Community",
+    date: new Date().toLocaleDateString("en-AU", { month: "short", year: "numeric" }),
+  };
+}
+
 function validateSection(content: CMSContent, key: CMSKey): string[] {
   const errors: string[] = [];
   if (key === "navLinks") {
@@ -160,7 +191,26 @@ export function CMSEditor({ initialContent, saveSection }: CMSEditorProps) {
   }
 
   function save(key: CMSKey) {
-    const errors = validateSection(content, key);
+    const contentForSave: CMSContent =
+      key === "announcements"
+        ? {
+            ...content,
+            announcements: content.announcements.map((item, index) => {
+              if (!item.href) return item;
+              const generated = buildAnnouncementFromHref(item.href, index);
+              return {
+                ...item,
+                id: item.id || generated.id,
+                title: item.title || generated.title,
+                summary: item.summary || generated.summary,
+                tag: item.tag || generated.tag,
+                date: item.date || generated.date,
+              };
+            }),
+          }
+        : content;
+
+    const errors = validateSection(contentForSave, key);
     if (errors.length > 0) {
       setStatus({ type: "error", message: errors.slice(0, 3).join(" ") });
       return;
@@ -169,7 +219,10 @@ export function CMSEditor({ initialContent, saveSection }: CMSEditorProps) {
     setStatus(null);
     startTransition(async () => {
       try {
-        await saveSection(key, JSON.stringify(content[key]));
+        await saveSection(key, JSON.stringify(contentForSave[key]));
+        if (key === "announcements") {
+          setContent(contentForSave);
+        }
         setStatus({ type: "success", message: `Saved ${SECTION_LABELS[key]} successfully.` });
       } catch (error) {
         setStatus({ type: "error", message: `Failed to save ${SECTION_LABELS[key]}: ${(error as Error).message}` });
@@ -440,26 +493,9 @@ function SectionForm({
 
   if (activeKey === "announcements") {
     return (
-      <EditableList
+      <TweetsTestimonialsEditor
         items={content.announcements}
-        emptyItem={{ id: "", title: "", summary: "", href: "", tag: "", date: "" }}
         onChange={(next) => onUpdate("announcements", next)}
-        renderItem={(item, onField) => (
-          <>
-            <label className="text-xs text-muted">ID</label>
-            <input className={textInputClasses()} value={item.id} onChange={(e) => onField("id", e.target.value)} />
-            <label className="text-xs text-muted">Title</label>
-            <input className={textInputClasses()} value={item.title} onChange={(e) => onField("title", e.target.value)} />
-            <label className="text-xs text-muted">Summary</label>
-            <textarea className={`${textInputClasses()} min-h-24`} value={item.summary} onChange={(e) => onField("summary", e.target.value)} />
-            <label className="text-xs text-muted">Href</label>
-            <input className={textInputClasses()} value={item.href || ""} onChange={(e) => onField("href", e.target.value)} />
-            <label className="text-xs text-muted">Tag</label>
-            <input className={textInputClasses()} value={item.tag || ""} onChange={(e) => onField("tag", e.target.value)} />
-            <label className="text-xs text-muted">Date</label>
-            <input className={textInputClasses()} value={item.date || ""} onChange={(e) => onField("date", e.target.value)} />
-          </>
-        )}
       />
     );
   }
@@ -587,6 +623,91 @@ function ImagePreview({ url, alt }: { url: unknown; alt: string }) {
     <div className="mt-2 overflow-hidden rounded-lg border border-white/[0.06] bg-white/[0.015]">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={url as string} alt={alt} className="h-36 w-full object-cover" />
+    </div>
+  );
+}
+
+function TweetsTestimonialsEditor({
+  items,
+  onChange,
+}: {
+  items: CMSContent["announcements"];
+  onChange: (next: CMSContent["announcements"]) => void;
+}) {
+  const [bulkLinks, setBulkLinks] = useState("");
+
+  function addBulkLinks() {
+    const links = bulkLinks
+      .split(/\s+/)
+      .map((link) => link.trim())
+      .filter(Boolean)
+      .filter((link) => isValidUrl(link));
+
+    if (links.length === 0) return;
+
+    const existingHrefs = new Set(items.map((item) => item.href).filter(Boolean));
+    const newItems = links
+      .filter((href) => !existingHrefs.has(href))
+      .map((href, index) => {
+        const generated = buildAnnouncementFromHref(href, index);
+        return {
+          id: generated.id,
+          title: generated.title,
+          summary: generated.summary,
+          href,
+          tag: generated.tag,
+          date: generated.date,
+        };
+      });
+
+    if (newItems.length === 0) return;
+    onChange([...newItems, ...items]);
+    setBulkLinks("");
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
+        <p className="text-xs font-semibold uppercase tracking-[0.12em] text-muted">Quick add from X links</p>
+        <p className="mt-1 text-xs text-muted">Paste one or many links (space/newline separated). Metadata is auto-filled.</p>
+        <textarea
+          className="mt-3 h-24 w-full rounded-xl border border-white/[0.06] bg-white/[0.02] p-3 text-sm text-text outline-none ring-green/30 transition focus:ring-2"
+          value={bulkLinks}
+          onChange={(e) => setBulkLinks(e.target.value)}
+          placeholder="https://x.com/SuperteamAU/status/123..."
+        />
+        <div className="mt-3 flex justify-end">
+          <button
+            type="button"
+            onClick={addBulkLinks}
+            className="rounded-xl border border-white/[0.1] bg-white/[0.02] px-4 py-2 text-sm text-muted transition hover:border-white/[0.16] hover:text-text"
+          >
+            Add links
+          </button>
+        </div>
+      </div>
+
+      <EditableList
+        items={items}
+        emptyItem={{ id: "", title: "", summary: "", href: "", tag: "", date: "" }}
+        onChange={onChange}
+        renderItem={(item, onField) => (
+          <>
+            <label className="text-xs text-muted">Href</label>
+            <input className={textInputClasses()} value={item.href || ""} onChange={(e) => onField("href", e.target.value)} />
+            <label className="text-xs text-muted">ID</label>
+            <input className={textInputClasses()} value={item.id} onChange={(e) => onField("id", e.target.value)} />
+            <label className="text-xs text-muted">Title</label>
+            <input className={textInputClasses()} value={item.title} onChange={(e) => onField("title", e.target.value)} />
+            <label className="text-xs text-muted">Summary</label>
+            <textarea className={`${textInputClasses()} min-h-24`} value={item.summary} onChange={(e) => onField("summary", e.target.value)} />
+            <label className="text-xs text-muted">Tag</label>
+            <input className={textInputClasses()} value={item.tag || ""} onChange={(e) => onField("tag", e.target.value)} />
+            <label className="text-xs text-muted">Date</label>
+            <input className={textInputClasses()} value={item.date || ""} onChange={(e) => onField("date", e.target.value)} />
+          </>
+        )}
+      />
     </div>
   );
 }

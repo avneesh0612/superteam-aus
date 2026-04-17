@@ -55,10 +55,17 @@ export const metadata: Metadata = {
 export default async function CMSPage({
   searchParams,
 }: {
-  searchParams?: { status?: string; message?: string };
+  searchParams?: Promise<{ status?: string; message?: string }>;
 }) {
+  const resolvedSearchParams = await searchParams;
   const supabase = await createServerSupabaseAuthClient();
-  const { data: userData } = await supabase.auth.getUser();
+  let userData: { user: Awaited<ReturnType<typeof supabase.auth.getUser>>["data"]["user"] } = { user: null };
+  try {
+    const { data } = await supabase.auth.getUser();
+    userData = data;
+  } catch {
+    userData = { user: null };
+  }
   const isAuthorized = isCmsAuthorizedUser(userData.user);
   const currentRole = getCmsAdminRole(userData.user);
   const canManageContent = hasCmsPermission(userData.user, "manage_content");
@@ -79,8 +86,8 @@ export default async function CMSPage({
     if (rankA !== rankB) return rankA - rankB;
     return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
   });
-  const status = searchParams?.status;
-  const message = searchParams?.message;
+  const status = resolvedSearchParams?.status;
+  const message = resolvedSearchParams?.message;
 
   async function logout() {
     "use server";

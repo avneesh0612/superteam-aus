@@ -1,16 +1,11 @@
 "use client";
 
-import { useState } from "react";
 import { Announcement } from "@/lib/types";
-import { ChevronDown } from "lucide-react";
 import { motion } from "framer-motion";
 import { Tweet } from "react-tweet";
 
 export function TestimonialsSection({ announcements }: { announcements: Announcement[] }) {
-  const [expanded, setExpanded] = useState(false);
-
   const feedItems = buildFeedItems(announcements);
-  const visibleItems = expanded ? feedItems : feedItems.slice(0, 6);
 
   if (feedItems.length === 0) return null;
 
@@ -47,7 +42,7 @@ export function TestimonialsSection({ announcements }: { announcements: Announce
 
         <div className="relative mt-8">
           <div className="columns-1 gap-3 md:columns-2 lg:columns-3 lg:gap-3 xl:columns-4">
-            {visibleItems.map((item, index) => (
+            {feedItems.map((item, index) => (
               <motion.div
                 key={item.id}
                 initial={{ opacity: 0, y: 14 }}
@@ -60,24 +55,7 @@ export function TestimonialsSection({ announcements }: { announcements: Announce
               </motion.div>
             ))}
           </div>
-
-          {!expanded && feedItems.length > 6 ? (
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-28 bg-[linear-gradient(180deg,rgba(11,16,22,0),rgba(11,16,22,0.62)_60%,rgba(11,16,22,0.92)_100%)]" />
-          ) : null}
         </div>
-
-        {feedItems.length > 6 ? (
-          <div className="relative z-10 mt-6 flex justify-center">
-            <button
-              type="button"
-              onClick={() => setExpanded((current) => !current)}
-              className="inline-flex items-center gap-3 rounded-full border border-white/10 bg-white px-5 py-4 text-sm font-semibold text-black transition hover:-translate-y-0.5 hover:shadow-[0_16px_40px_rgba(255,255,255,0.12)]"
-            >
-              {expanded ? "Collapse feed" : "Expand the feed"}
-              <ChevronDown className={`h-4 w-4 transition-transform ${expanded ? "rotate-180" : ""}`} />
-            </button>
-          </div>
-        ) : null}
       </div>
     </section>
   );
