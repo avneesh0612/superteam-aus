@@ -1,5 +1,11 @@
 # Superteam Australia Site
 
+## Quick links
+
+- [Demo](https://www.loom.com/share/80f1d37a4d9d4e67a125fcb8d1079c1e)
+- [Website](https://superteam-aus-site.vercel.app/)
+- [Design](https://www.figma.com/design/lzTS7HEaHP9RfNgUDJ1WO0/Superteam-Australia-%E2%80%94-Design?node-id=0-1&t=z4ZGTdVE4xuQmvUK-1)
+
 Next.js 14 site with a Supabase-backed CMS.
 
 ## Website overview
