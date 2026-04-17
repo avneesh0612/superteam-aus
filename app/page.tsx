@@ -14,7 +14,7 @@ import { getSiteContent } from "@/lib/site-cms";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Home",
+  title: "Home | Superteam Australia",
   description: "Explore Superteam Australia's community, events, ecosystem partners, and opportunities.",
   alternates: {
     canonical: "/",

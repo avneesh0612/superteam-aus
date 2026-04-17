@@ -21,7 +21,7 @@ const SECTION_LABELS: Record<CMSKey, string> = {
   events: "Events",
   members: "Members",
   partners: "Partners",
-  announcements: "Announcements",
+  announcements: "Tweets & Testimonials",
   testimonials: "Testimonials",
   faqs: "FAQs",
 };
@@ -33,7 +33,7 @@ const SECTION_DESCRIPTIONS: Record<CMSKey, string> = {
   events: "Upcoming events with city, date, and links.",
   members: "Member directory records and featured cards.",
   partners: "Partner logos, links, and featured projects.",
-  announcements: "Homepage highlights and update cards.",
+  announcements: "Builder Voices feed entries (X/Twitter links and testimonial sources).",
   testimonials: "Social proof quotes on the landing page.",
   faqs: "Frequently asked questions and answers.",
 };
@@ -116,9 +116,9 @@ function validateSection(content: CMSContent, key: CMSKey): string[] {
   } else if (key === "announcements") {
     content.announcements.forEach((item, i) => {
       if (!isNonEmpty(item.id) || !isNonEmpty(item.title) || !isNonEmpty(item.summary)) {
-        errors.push(`Announcement ${i + 1}: id, title, and summary are required.`);
+        errors.push(`Tweets/Testimonial item ${i + 1}: id, title, and summary are required.`);
       }
-      if (item.href && !isValidUrl(item.href)) errors.push(`Announcement ${i + 1}: href must be valid.`);
+      if (item.href && !isValidUrl(item.href)) errors.push(`Tweets/Testimonial item ${i + 1}: href must be valid.`);
     });
   } else if (key === "testimonials") {
     content.testimonials.forEach((item, i) => {
