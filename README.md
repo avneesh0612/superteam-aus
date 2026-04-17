@@ -6,7 +6,7 @@
 - [Website](https://superteam-aus-site.vercel.app/)
 - [Design](https://www.figma.com/design/lzTS7HEaHP9RfNgUDJ1WO0/Superteam-Australia-%E2%80%94-Design?node-id=0-1&t=z4ZGTdVE4xuQmvUK-1)
 
-Next.js 14 site with a Supabase-backed CMS.
+Next.js 16 site with a Supabase-backed CMS.
 
 ## Website overview
 
@@ -25,7 +25,7 @@ This project powers the public Superteam Australia web presence and an internal 
 
 ## Stack
 
-- **Framework**: Next.js 14 (App Router)
+- **Framework**: Next.js 16 (App Router)
 - **Language**: TypeScript
 - **Styling**: Tailwind CSS
 - **UI primitives**: shadcn-style components built on Radix UI
