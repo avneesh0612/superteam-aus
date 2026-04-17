@@ -1,0 +1,5 @@
+<svg width="320" height="96" viewBox="0 0 320 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="22" y="22" width="52" height="52" rx="12" fill="#C9B66B"/>
+  <path d="M36 62V34H50.5C57.4036 34 62 37.8927 62 44C62 50.1073 57.4036 54 50.5 54H44V62H36ZM44 47H49.5C52.5376 47 54 45.8014 54 44C54 42.1986 52.5376 41 49.5 41H44V47Z" fill="#101214"/>
+  <text x="100" y="60" fill="#F5F7FA" font-family="Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="5">PYTH</text>
+</svg>

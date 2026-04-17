@@ -2,6 +2,21 @@
 
 Next.js 14 site with a Supabase-backed CMS.
 
+## Website overview
+
+This project powers the public Superteam Australia web presence and an internal CMS used to manage live content without code changes.
+
+- **Public experience**:
+  - ` / ` landing page for community positioning, stats, events, featured members, partners, testimonials, FAQ, and CTA
+  - ` /members ` searchable member directory
+  - ` /get-involved ` onboarding/application page
+- **Content source**:
+  - Most homepage + members content is loaded from Supabase-backed CMS tables
+  - Site-level copy (hero, CTA, footer, form copy, members hero copy) is stored in dedicated site-content sections
+- **Rendering model**:
+  - App Router server components fetch content on request/build
+  - Client components are used for interactive UI (filters, animations, forms)
+
 ## Stack
 
 - **Framework**: Next.js 14 (App Router)
@@ -36,6 +51,19 @@ bun run start
 
 ## CMS
 
+### Admin flow (auth + editing)
+
+1. Admin opens ` /cms `.
+2. If unauthenticated, they sign in via email/password or magic link.
+3. Supabase redirects to ` /auth/callback ` after auth actions.
+4. Callback exchanges session and routes the user back to CMS/password flow.
+5. CMS verifies authorization:
+   - `cms_admin` metadata/claims/roles, or
+   - allowlisted email from `CMS_ADMIN_EMAILS`.
+6. Authorized users can edit JSON-backed content sections in CMS UI.
+7. Save actions run as secure server actions using the service role key.
+8. Site paths are revalidated so updates appear immediately on public pages.
+
 ### Environment variables
 
 Copy `.env.example` to `.env` and fill it in.
@@ -49,6 +77,25 @@ Copy `.env.example` to `.env` and fill it in.
   - `CMS_ADMIN_EMAILS` (comma-separated admin allowlist)
 - **Optional (recommended)**:
   - `NEXT_PUBLIC_SITE_URL` (used in magic link and password reset redirects)
+  - `CRON_SECRET` (required in production to secure Vercel cron endpoints)
+  - `LUMA_API_KEY` (required for Luma event sync)
+
+### Luma event sync cron
+
+This project includes a Vercel cron job that pulls events from the Luma API and updates the CMS `events` section in Supabase.
+
+- **Cron config**: `vercel.json` (`/api/cron/luma-events`, daily at 06:00 UTC)
+- **Route**: `app/api/cron/luma-events/route.ts`
+- **Auth**: endpoint validates `Authorization: Bearer <CRON_SECRET>`
+- **Luma auth**: uses `x-luma-api-key: $LUMA_API_KEY`
+- **API endpoint used**: `GET https://public-api.luma.com/v1/calendar/list-events`
+- **Sync behavior**:
+  - Luma-imported events are stored with ids prefixed by `luma-`
+  - Existing manual CMS events (non-`luma-` ids) are preserved
+  - Imported events are marked as `upcoming` or `past` based on start time
+
+After setting env vars in Vercel, deploy and the cron will run automatically in production.
+If you are on Vercel Hobby, keep it to a daily schedule (Hobby does not allow multiple cron runs per day).
 
 ### Security model
 
@@ -87,6 +134,8 @@ Get involved submissions are stored in:
 
 - `public.get_involved_submissions`
 
+Site copy/settings are also normalized into dedicated site-content tables (see migrations and `lib/site-cms.ts`).
+
 ### Dummy content / seeding
 
 The project ships with seeded dummy content already applied in your Supabase project.
@@ -101,3 +150,7 @@ See `docs/` for project documentation:
 - `docs/supabase-cms.md`
 - `docs/design-system-rules.md`
 - `docs/challenge-brief.md`
+
+## Design file
+
+- Figma: [Superteam Australia — Design](https://www.figma.com/design/lzTS7HEaHP9RfNgUDJ1WO0/Superteam-Australia-%E2%80%94-Design?node-id=0-1&t=z4ZGTdVE4xuQmvUK-1)

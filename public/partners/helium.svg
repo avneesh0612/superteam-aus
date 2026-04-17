@@ -1,0 +1,9 @@
+<svg width="320" height="96" viewBox="0 0 320 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="40" cy="48" r="8" fill="#24D6C9"/>
+  <circle cx="68" cy="32" r="8" fill="#24D6C9"/>
+  <circle cx="68" cy="64" r="8" fill="#24D6C9"/>
+  <path d="M48 48H60" stroke="#24D6C9" stroke-width="6" stroke-linecap="round"/>
+  <path d="M40 48L60 36" stroke="#24D6C9" stroke-width="6" stroke-linecap="round"/>
+  <path d="M40 48L60 60" stroke="#24D6C9" stroke-width="6" stroke-linecap="round"/>
+  <text x="100" y="60" fill="#F5F7FA" font-family="Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="5">HELIUM</text>
+</svg>

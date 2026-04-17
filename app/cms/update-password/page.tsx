@@ -1,15 +1,18 @@
- "use client";
+"use client";
 
 import { createBrowserSupabaseClient } from "@/lib/supabase-browser";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 
 export default function UpdatePasswordPage() {
   const [status, setStatus] = useState<string>("");
   const [error, setError] = useState<string>("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  async function updatePassword(formData: FormData) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    const formData = new FormData(e.currentTarget);
     const password = formData.get("password");
     const confirmPassword = formData.get("confirmPassword");
 
@@ -31,18 +34,23 @@ export default function UpdatePasswordPage() {
       return;
     }
 
-    const supabase = createBrowserSupabaseClient();
-    const { error: updateError } = await supabase.auth.updateUser({ password });
+    setIsSubmitting(true);
+    try {
+      const supabase = createBrowserSupabaseClient();
+      const { error: updateError } = await supabase.auth.updateUser({ password });
 
-    if (updateError) {
-      setError(updateError.message);
-      return;
+      if (updateError) {
+        setError(updateError.message);
+        return;
+      }
+
+      setStatus("Password updated. Redirecting to CMS...");
+      setTimeout(() => {
+        router.replace("/cms?status=ok&message=Password%20updated.%20You%20can%20now%20sign%20in.");
+      }, 600);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setStatus("Password updated. Redirecting to CMS...");
-    setTimeout(() => {
-      router.replace("/cms?status=ok&message=Password%20updated.%20You%20can%20now%20sign%20in.");
-    }, 600);
   }
 
   return (
@@ -62,24 +70,31 @@ export default function UpdatePasswordPage() {
         {status ? <div className="rounded-2xl border border-green/30 bg-green/10 p-4 text-sm text-green">{status}</div> : null}
         {error ? <div className="rounded-2xl border border-red-400/40 bg-red-500/10 p-4 text-sm text-red-300">{error}</div> : null}
 
-        <form action={updatePassword} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <input
             type="password"
             name="password"
+            required
+            minLength={8}
+            autoComplete="new-password"
             placeholder="New password"
             className="w-full rounded-xl border border-white/10 bg-bg px-4 py-3 text-sm text-text outline-none ring-green/40 transition focus:ring-2"
           />
           <input
             type="password"
             name="confirmPassword"
+            required
+            minLength={8}
+            autoComplete="new-password"
             placeholder="Confirm new password"
             className="w-full rounded-xl border border-white/10 bg-bg px-4 py-3 text-sm text-text outline-none ring-green/40 transition focus:ring-2"
           />
           <button
             type="submit"
-            className="w-full rounded-xl border border-green/30 bg-green/20 px-4 py-2.5 text-sm font-semibold text-green transition hover:bg-green/30"
+            disabled={isSubmitting}
+            className="w-full rounded-xl border border-green/30 bg-green/20 px-4 py-2.5 text-sm font-semibold text-green transition hover:bg-green/30 disabled:opacity-60"
           >
-            Update Password
+            {isSubmitting ? "Updating…" : "Update Password"}
           </button>
         </form>
       </div>

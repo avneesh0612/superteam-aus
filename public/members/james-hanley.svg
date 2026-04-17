@@ -1,0 +1,13 @@
+<svg width="640" height="640" viewBox="0 0 640 640" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="640" height="640" fill="#0E1116"/>
+  <circle cx="320" cy="320" r="220" fill="url(#paint0_linear_1_2)"/>
+  <circle cx="320" cy="274" r="86" fill="#F4F7FB" fill-opacity="0.95"/>
+  <path d="M196 468C196 391.925 257.925 330 334 330H337C413.075 330 475 391.925 475 468V500H196V468Z" fill="#F4F7FB" fill-opacity="0.95"/>
+  <text x="320" y="590" fill="#7C8798" font-family="Arial, sans-serif" font-size="30" text-anchor="middle">JAMES HANLEY</text>
+  <defs>
+    <linearGradient id="paint0_linear_1_2" x1="128" y1="112" x2="512" y2="528" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F4C26B"/>
+      <stop offset="1" stop-color="#9B8CFF"/>
+    </linearGradient>
+  </defs>
+</svg>

@@ -1,0 +1,12 @@
+<svg width="320" height="96" viewBox="0 0 320 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="solana-gradient" x1="38" y1="20" x2="92" y2="76" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#14F195"/>
+      <stop offset="1" stop-color="#9945FF"/>
+    </linearGradient>
+  </defs>
+  <rect x="18" y="18" width="58" height="10" rx="5" fill="url(#solana-gradient)"/>
+  <rect x="28" y="43" width="58" height="10" rx="5" fill="url(#solana-gradient)"/>
+  <rect x="18" y="68" width="58" height="10" rx="5" fill="url(#solana-gradient)"/>
+  <text x="108" y="60" fill="#F5F7FA" font-family="Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="5">SOLANA</text>
+</svg>

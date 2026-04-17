@@ -2,9 +2,7 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { ReactNode } from "react";
-import { CMSContent } from "@/lib/types";
-
-type CMSKey = keyof CMSContent;
+import type { CMSContent, CMSKey } from "@/lib/types";
 
 type CMSEditorProps = {
   initialContent: CMSContent;
@@ -41,7 +39,7 @@ const SECTION_DESCRIPTIONS: Record<CMSKey, string> = {
 };
 
 function textInputClasses() {
-  return "w-full rounded-xl border border-white/10 bg-bg px-3 py-2 text-sm text-text";
+  return "w-full rounded-xl border border-white/[0.06] bg-white/[0.02] px-3 py-2 text-sm text-text outline-none ring-green/30 transition focus:ring-2";
 }
 
 function isNonEmpty(value: unknown) {
@@ -58,9 +56,13 @@ function isValidUrl(value: unknown) {
   }
 }
 
+function isValidAssetPath(value: unknown) {
+  return typeof value === "string" && value.startsWith("/");
+}
+
 function isValidHref(value: unknown) {
   if (typeof value !== "string" || value.trim().length === 0) return false;
-  return value.startsWith("/") || isValidUrl(value);
+  return isValidAssetPath(value) || isValidUrl(value);
 }
 
 function validateSection(content: CMSContent, key: CMSKey): string[] {
@@ -87,7 +89,9 @@ function validateSection(content: CMSContent, key: CMSKey): string[] {
       if (!isNonEmpty(item.id) || !isNonEmpty(item.title) || !isNonEmpty(item.city) || !isNonEmpty(item.date)) {
         errors.push(`Event ${i + 1}: id, title, city, and date are required.`);
       }
-      if (!isValidUrl(item.image)) errors.push(`Event ${i + 1}: image must be a valid http/https URL.`);
+      if (!(isValidUrl(item.image) || isValidAssetPath(item.image))) {
+        errors.push(`Event ${i + 1}: image must be a valid URL or local /public asset path.`);
+      }
       if (!isValidUrl(item.lumaUrl)) errors.push(`Event ${i + 1}: luma URL must be valid.`);
       if (item.status && !["upcoming", "past"].includes(item.status)) errors.push(`Event ${i + 1}: status must be upcoming or past.`);
     });
@@ -96,13 +100,17 @@ function validateSection(content: CMSContent, key: CMSKey): string[] {
       if (!isNonEmpty(item.id) || !isNonEmpty(item.name) || !isNonEmpty(item.role)) {
         errors.push(`Member ${i + 1}: id, name, and role are required.`);
       }
-      if (!isValidUrl(item.photo)) errors.push(`Member ${i + 1}: photo must be a valid URL.`);
+      if (!(isValidUrl(item.photo) || isValidAssetPath(item.photo))) {
+        errors.push(`Member ${i + 1}: photo must be a valid URL or local /public asset path.`);
+      }
       if (item.twitterUrl && !isValidUrl(item.twitterUrl)) errors.push(`Member ${i + 1}: twitter URL must be valid.`);
     });
   } else if (key === "partners") {
     content.partners.forEach((item, i) => {
       if (!isNonEmpty(item.id) || !isNonEmpty(item.name)) errors.push(`Partner ${i + 1}: id and name are required.`);
-      if (item.logoUrl && !isValidUrl(item.logoUrl)) errors.push(`Partner ${i + 1}: logo URL must be valid.`);
+      if (item.logoUrl && !(isValidUrl(item.logoUrl) || isValidAssetPath(item.logoUrl))) {
+        errors.push(`Partner ${i + 1}: logo URL must be a valid URL or local /public asset path.`);
+      }
       if (item.websiteUrl && !isValidUrl(item.websiteUrl)) errors.push(`Partner ${i + 1}: website URL must be valid.`);
     });
   } else if (key === "announcements") {
@@ -186,7 +194,7 @@ export function CMSEditor({ initialContent, saveSection }: CMSEditorProps) {
       ) : null}
 
       <div className="grid gap-6 lg:grid-cols-[260px,1fr]">
-        <aside className="soft-panel h-fit rounded-3xl p-4">
+        <aside className="h-fit rounded-3xl border border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] p-4 backdrop-blur-md">
           <p className="px-2 pb-3 text-xs font-semibold uppercase tracking-[0.14em] text-muted">Content Sections</p>
           <div className="space-y-2">
             {keys.map((key) => (
@@ -197,7 +205,7 @@ export function CMSEditor({ initialContent, saveSection }: CMSEditorProps) {
                 className={`w-full rounded-xl border px-3 py-3 text-left text-sm transition ${
                   activeKey === key
                     ? "border-green/30 bg-green/10 text-green"
-                    : "border-white/10 bg-panel2/20 text-muted hover:border-white/20 hover:text-text"
+                    : "border-white/[0.06] bg-white/[0.015] text-muted hover:border-white/[0.14] hover:text-text"
                 }`}
               >
                 <div className="font-semibold">{SECTION_LABELS[key]}</div>
@@ -207,8 +215,8 @@ export function CMSEditor({ initialContent, saveSection }: CMSEditorProps) {
           </div>
         </aside>
 
-        <div className="rounded-3xl border border-white/10 bg-panel p-6">
-          <div className="mb-5 flex flex-col gap-4 border-b border-white/10 pb-5 sm:flex-row sm:items-end sm:justify-between">
+        <div className="rounded-3xl border border-white/[0.06] bg-[linear-gradient(180deg,rgba(255,255,255,0.03),rgba(255,255,255,0.015))] p-6 backdrop-blur-md">
+          <div className="mb-5 flex flex-col gap-4 border-b border-white/[0.06] pb-5 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="font-display text-3xl">{SECTION_LABELS[activeKey]}</h2>
               <p className="mt-1 text-sm text-muted">{SECTION_DESCRIPTIONS[activeKey]}</p>
@@ -217,7 +225,7 @@ export function CMSEditor({ initialContent, saveSection }: CMSEditorProps) {
               <button
                 type="button"
                 onClick={() => toggleAdvanced(activeKey)}
-                className="rounded-xl border border-white/20 bg-white/[0.03] px-3 py-2 text-xs text-muted"
+                className="rounded-xl border border-white/[0.1] bg-white/[0.02] px-3 py-2 text-xs text-muted transition hover:border-white/[0.16] hover:text-text"
               >
                 {advancedMode[activeKey] ? "Use form editor" : "Advanced JSON"}
               </button>
@@ -234,7 +242,7 @@ export function CMSEditor({ initialContent, saveSection }: CMSEditorProps) {
 
           {advancedMode[activeKey] ? (
             <textarea
-              className="h-[28rem] w-full rounded-2xl border border-white/10 bg-bg p-4 font-mono text-xs text-white/90 outline-none ring-green/40 transition focus:ring-2"
+              className="h-[28rem] w-full rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4 font-mono text-xs text-white/90 outline-none ring-green/35 transition focus:ring-2"
               value={JSON.stringify(content[activeKey], null, 2)}
               onChange={(e) => {
                 try {
@@ -514,7 +522,7 @@ function EditableList<T extends Record<string, unknown>>({
         <button
           type="button"
           onClick={() => onChange([...items, structuredClone(emptyItem)])}
-          className="rounded-xl border border-white/20 bg-white/[0.03] px-4 py-2 text-sm text-muted hover:text-text"
+          className="rounded-xl border border-white/[0.1] bg-white/[0.02] px-4 py-2 text-sm text-muted transition hover:border-white/[0.16] hover:text-text"
         >
           Add Item
         </button>
@@ -525,7 +533,7 @@ function EditableList<T extends Record<string, unknown>>({
       ) : null}
 
       {items.map((item, index) => (
-        <div key={`${String(item.id ?? index)}-${index}`} className="space-y-2 rounded-2xl border border-white/10 bg-bg/70 p-4">
+        <div key={`${String(item.id ?? index)}-${index}`} className="space-y-2 rounded-2xl border border-white/[0.06] bg-white/[0.02] p-4">
           <div className="mb-2 flex items-center justify-between">
             <p className="text-sm text-muted">Item {index + 1}</p>
             <div className="flex items-center gap-3">
@@ -537,7 +545,7 @@ function EditableList<T extends Record<string, unknown>>({
                   [next[index - 1], next[index]] = [next[index], next[index - 1]];
                   onChange(next);
                 }}
-                className="rounded-lg border border-white/15 px-2 py-1 text-xs text-muted disabled:opacity-40"
+                className="rounded-lg border border-white/[0.1] px-2 py-1 text-xs text-muted transition hover:border-white/[0.16] hover:text-text disabled:opacity-40"
               >
                 Move Up
               </button>
@@ -549,14 +557,14 @@ function EditableList<T extends Record<string, unknown>>({
                   [next[index], next[index + 1]] = [next[index + 1], next[index]];
                   onChange(next);
                 }}
-                className="rounded-lg border border-white/15 px-2 py-1 text-xs text-muted disabled:opacity-40"
+                className="rounded-lg border border-white/[0.1] px-2 py-1 text-xs text-muted transition hover:border-white/[0.16] hover:text-text disabled:opacity-40"
               >
                 Move Down
               </button>
               <button
                 type="button"
                 onClick={() => onChange(items.filter((_, i) => i !== index))}
-                className="rounded-lg border border-red-300/30 px-2 py-1 text-xs text-red-300 hover:text-red-200"
+                className="rounded-lg border border-red-300/30 bg-red-500/[0.04] px-2 py-1 text-xs text-red-300 transition hover:border-red-300/45 hover:text-red-200"
               >
                 Remove
               </button>
@@ -576,7 +584,7 @@ function EditableList<T extends Record<string, unknown>>({
 function ImagePreview({ url, alt }: { url: unknown; alt: string }) {
   if (!isValidUrl(url)) return null;
   return (
-    <div className="mt-2 overflow-hidden rounded-lg border border-white/10">
+    <div className="mt-2 overflow-hidden rounded-lg border border-white/[0.06] bg-white/[0.015]">
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={url as string} alt={alt} className="h-36 w-full object-cover" />
     </div>

@@ -1,0 +1,7 @@
+<svg width="320" height="96" viewBox="0 0 320 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M32 34L48 24L64 34V54L48 64L32 54V34Z" stroke="#F5B971" stroke-width="6" stroke-linejoin="round"/>
+  <path d="M48 24V64" stroke="#F5B971" stroke-width="6" stroke-linecap="round"/>
+  <path d="M32 34L64 54" stroke="#F5B971" stroke-width="6" stroke-linecap="round"/>
+  <path d="M64 34L32 54" stroke="#F5B971" stroke-width="6" stroke-linecap="round"/>
+  <text x="100" y="60" fill="#F5F7FA" font-family="Arial, sans-serif" font-size="30" font-weight="700" letter-spacing="5">HIVE</text>
+</svg>
